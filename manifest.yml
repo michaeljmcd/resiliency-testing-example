@@ -12,7 +12,7 @@ spec:
   selector:
     matchLabels:
       app: mq-broker
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -21,3 +21,15 @@ spec:
       containers:
       - name: mq-broker
         image: rmohr/activemq
+        volumeMounts:
+        - name: message-store
+          mountPath: /opt/activemq/data
+  volumeClaimTemplates:
+  - metadata:
+      name: message-store
+    spec:
+      accessModes: ["ReadWriteMany"]
+      storageClassName: local
+      resources:
+        requests:
+          storage: 50Mi

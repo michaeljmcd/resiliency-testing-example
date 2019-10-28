@@ -3,6 +3,18 @@ kind: Namespace
 metadata:
     name: resiliency-testing-example
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: message-store
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 100Mi
+  hostPath:
+    path: /data/message-store/
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -21,6 +33,8 @@ spec:
       containers:
       - name: mq-broker
         image: rmohr/activemq
+        ports:
+        - containerPort: 61616
         volumeMounts:
         - name: message-store
           mountPath: /opt/activemq/data
@@ -28,8 +42,8 @@ spec:
   - metadata:
       name: message-store
     spec:
-      accessModes: ["ReadWriteMany"]
-      storageClassName: local
+      accessModes: 
+      - ReadWriteOnce
       resources:
         requests:
           storage: 50Mi

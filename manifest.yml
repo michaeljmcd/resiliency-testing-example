@@ -4,6 +4,19 @@ metadata:
     name: resiliency-testing-example
 ---
 apiVersion: v1
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-message-store
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+  - ReadWriteMany
+  hostPath:
+    path: "/c/temp/volumes/message-store"
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: message-store-claim

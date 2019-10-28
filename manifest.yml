@@ -42,3 +42,38 @@ spec:
       - name: mq-message-store
         persistentVolumeClaim:
           claimName: message-store-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-identity-svc
+spec:
+  selector:
+    app: mock-identity-svc
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-identity-svc-deployment
+  labels:
+    app: mock-identity-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mock-identity-svc
+  template:
+    metadata:
+      labels:
+        app: mock-identity-svc
+    spec:
+      containers:
+      - name: wiremock
+        image: rodolpheche/wiremock
+        ports:
+        - containerPort: 8080
+---        

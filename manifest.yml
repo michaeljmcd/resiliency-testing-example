@@ -34,6 +34,7 @@ spec:
         image: rmohr/activemq
         ports:
         - containerPort: 61616
+        - containerPort: 8161
         volumeMounts:
         - name: mq-message-store
           mountPath: /opt/activemq/data

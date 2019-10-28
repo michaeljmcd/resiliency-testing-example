@@ -4,16 +4,15 @@ metadata:
     name: resiliency-testing-example
 ---
 apiVersion: v1
-kind: PersistentVolume
+kind: PersistentVolumeClaim
 metadata:
-  name: message-store
+  name: message-store-claim
 spec:
   accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 100Mi
-  hostPath:
-    path: /data/message-store/
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -36,14 +35,9 @@ spec:
         ports:
         - containerPort: 61616
         volumeMounts:
-        - name: message-store
+        - name: mq-message-store
           mountPath: /opt/activemq/data
-  volumeClaimTemplates:
-  - metadata:
-      name: message-store
-    spec:
-      accessModes: 
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 50Mi
+      volumes:
+      - name: mq-message-store
+        persistentVolumeClaim:
+          claimName: message-store-claim

@@ -53,7 +53,7 @@ public class MessageBrokerConfiguration {
     // No, this doesn't belong here, but I'm lazy.
     @Bean
     public RestTemplate restTemplate(final RestTemplateBuilder builder, 
-            final @Value("${identity-svc.url}") String identitySvcUrl) {
+            final @Value("${identity-svc-url}") String identitySvcUrl) {
         return builder.rootUri(identitySvcUrl).build();
     }
 

@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-test-results
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: "/c/temp/volumes/test-results"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-results-claim
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jmeter-test-job
+  labels:
+    app: jmeter-test
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      volumes:
+      - name: result-store
+        persistentVolumeClaim:
+          claimName: test-results-claim
+      containers:
+      - name: jmeter-container
+        image: localhost:5000/load-tests
+        volumeMounts:
+        - name: result-store
+          mountPath: /jmeter

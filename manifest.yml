@@ -32,7 +32,7 @@ kind: StatefulSet
 metadata:
     name: mq-broker
 spec:
-  serviceName: activemq-broker-cluster
+  serviceName: mq-broker
   selector:
     matchLabels:
       app: mq-broker
@@ -55,6 +55,26 @@ spec:
       - name: mq-message-store
         persistentVolumeClaim:
           claimName: message-store-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mq-broker
+  name: mq-broker
+spec:
+  clusterIP: None
+  selector:
+    app: mq-broker
+  ports:
+  - protocol: TCP
+    port: 8161
+    targetPort: 8161
+    name: admin
+  - protocol: TCP
+    port: 61616
+    targetPort: 61616
+    name: nio
 ---
 apiVersion: v1
 kind: Service
@@ -149,3 +169,15 @@ spec:
         - name: JAVA_OPTS
           value: -Dspring.profiles.active=KUBE
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: amq-consumer
+spec:
+  selector:
+    app: amq-consumer
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+

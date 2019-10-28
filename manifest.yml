@@ -124,3 +124,28 @@ spec:
     port: 8080
     targetPort: 8080
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amq-consumer-deployment
+  labels:
+    app: amq-consumer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: amq-consumer
+  template:
+    metadata:
+      labels:
+        app: amq-consumer
+    spec:
+      containers:
+      - name: amq-consumer
+        image: localhost:5000/amq-consumer
+        ports:
+        - containerPort: 8080
+        env:
+        - name: JAVA_OPTS
+          value: -Dspring.profiles.active=KUBE
+---

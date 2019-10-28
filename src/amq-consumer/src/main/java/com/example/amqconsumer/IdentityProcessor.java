@@ -6,12 +6,16 @@ import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.io.StringReader;
+import org.springframework.web.client.RestTemplate;
 
 @Component
 @Slf4j
 public class IdentityProcessor implements Processor {
+    final RestTemplate restTemplate;
+
     @Autowired
-    public IdentityProcessor() {
+    public IdentityProcessor(final RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -25,5 +29,10 @@ public class IdentityProcessor implements Processor {
         }
 
         log.info("Received message {}", messageBody);
+
+        final String response = restTemplate.postForObject("/identity", messageBody, String.class);
+
+        log.info("Got answer {}", response);
+        log.info("And that's all she wrote.");
     }
 }

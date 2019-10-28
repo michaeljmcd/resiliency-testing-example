@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 
 import javax.jms.ConnectionFactory;
 
@@ -47,6 +49,13 @@ public class MessageBrokerConfiguration {
 
 		return activeMQComponent;
 	}
+
+    // No, this doesn't belong here, but I'm lazy.
+    @Bean
+    public RestTemplate restTemplate(final RestTemplateBuilder builder, 
+            final @Value("${identity-svc.url}") String identitySvcUrl) {
+        return builder.rootUri(identitySvcUrl).build();
+    }
 
 	private RedeliveryPolicy redeliveryPolicy() {
 		RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();

@@ -48,6 +48,7 @@ spec:
       - name: mq-broker
         image: rmohr/activemq
         ports:
+        - containerPort: 61613
         - containerPort: 61616
         - containerPort: 8161
         volumeMounts:
@@ -77,6 +78,10 @@ spec:
     port: 61616
     targetPort: 61616
     name: nio
+  - protocol: TCP
+    port: 61613
+    targetPort: 61613
+    name: stomp
 ---
 apiVersion: v1
 kind: Service

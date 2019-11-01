@@ -10,11 +10,12 @@ metadata:
   name: local-message-store
 spec:
   capacity:
-    storage: 100Mi
+    storage: 500Mi
+  storageClassName: manual
   accessModes:
   - ReadWriteMany
   hostPath:
-    path: "/c/temp/volumes/message-store"
+    path: "/host_mnt/c/temp/volumes/message-store"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -23,6 +24,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
+  storageClassName: manual
   resources:
     requests:
       storage: 100Mi

@@ -1,0 +1,10 @@
+whitelistObjectNames: ["org.apache.activemq:*"]
+rules:
+  - pattern: 'org.apache.activemq<type=(\w+), name=(\w+)><>Value: (\d+)'
+    name: activemq_$1_$2
+    value: $3
+    valueFactor: 0.001
+    labels: {}
+    help: "ActiveMQ metric $1 $2"
+    type: GAUGE
+    attrNameSnakeCase: false

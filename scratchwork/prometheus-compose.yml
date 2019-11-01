@@ -1,0 +1,14 @@
+version: "3.2"
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+    - "9090:9090"
+#     volumes:
+#       - type: volume
+#         source: prometheus.yml
+#         target: /etc/prometheus/prometheus.yml
+  activemq:
+    image: localhost:5000/activemq
+    ports:
+    - "8161:8161"

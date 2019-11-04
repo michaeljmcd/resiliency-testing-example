@@ -12,7 +12,7 @@
             "title": "at-least-one-broker-available",
             "probes": [
                 {
-                    "name": "count-broker-pods",
+                    "name": "broker-available",
                     "type": "probe",
                     "tolerance": 2,
                     "provider": {
@@ -25,9 +25,37 @@
                             "ns": "resiliency-testing-example"
                         }
                     }
+                },
+                {
+                    "name": "publish-a-message",
+                    "type": "probe",
+                    "tolerance": true,
+                    "provider": {
+                        "type": "python",
+                        "module": "broker_failover",
+                        "func": "publishMessage",
+                        "arguments": {
+                            "queue": "MESSAGES.T.ALL",
+                            "message": "testing 1 2 3",
+                            "count": 5
+                        }
+                    }
+                },
+                {
+                    "name": "queue-is-not-backed-up",
+                    "type": "probe",
+                    "tolerance": [0, 5],
+                    "provider": {
+                        "type": "python",
+                        "module": "broker_failover",
+                        "func": "fetchQueueDepth",
+                        "arguments": {
+                            "queue": "MESSAGES.T.ALL"
+                        }
+                    }
                 }
             ]
-        },
+    },
     "method": [
         {
             "type": "action",

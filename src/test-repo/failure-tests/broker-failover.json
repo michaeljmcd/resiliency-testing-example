@@ -1,0 +1,51 @@
+{
+    "version": "1.0.0",
+    "title": "Listeners should process messages despite a single broker failing.",
+    "description": "Listeners should fail over.",
+    "tags": ["messaging"],
+    "secrets": {
+        "kubernetes": {
+            "KUBERNETES_CONTEXT": "docker-desktop"
+        }
+    },
+    "steady-state-hypothesis": {
+            "title": "at-least-one-broker-available",
+            "probes": [
+                {
+                    "name": "count-broker-pods",
+                    "type": "probe",
+                    "tolerance": 2,
+                    "provider": {
+                        "type": "python",
+                        "secrets": ["kubernetes"],
+                        "module": "chaosk8s.pod.probes",
+                        "func": "count_pods",
+                        "arguments": {
+                            "label_selector": "app=mq-broker",
+                            "ns": "resiliency-testing-example"
+                        }
+                    }
+                }
+            ]
+        },
+    "method": [
+        {
+            "type": "action",
+            "name": "terminate-broker-pod",
+            "provider": {
+                "type": "python",
+                "module": "chaosk8s.pod.actions",
+                "secrets": ["kubernetes"],
+                "func": "terminate_pods",
+                "arguments": {
+                    "name_pattern": "mq-broker-.*$",
+                    "rand": true,
+                    "ns": "resiliency-testing-example"
+                }
+            },
+            "pauses": {
+                "after": 5
+            }
+        }
+    ]
+}

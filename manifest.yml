@@ -83,6 +83,25 @@ spec:
     targetPort: 61613
     name: stomp
 ---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mq-broker-0-ingress
+  namespace: resiliency-testing-example
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/app-root: /
+#    nginx.ingress.kubernetes.io/add-base-url: /mq-broker-0
+spec:
+  rules:
+  - host: 'kubernetes.docker.internal'
+    http:
+      paths:
+      - backend:
+          serviceName: mq-broker
+          servicePort: 8161
+        path: /
+---
 apiVersion: v1
 kind: Service
 metadata:

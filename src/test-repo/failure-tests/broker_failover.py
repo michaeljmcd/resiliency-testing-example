@@ -3,9 +3,8 @@ import json
 import stomp
 
 def determineBrokerUrls():
-    # TODO: use environment variables and the like here
-    return ['mq-broker-0.docker.internal', 
-            'mq-broker-1.docker.internal']
+    return ['localhost:8161', 
+            'localhost:8162']
 
 def determineBrokerStompUrls():
     return [('localhost', 61613),

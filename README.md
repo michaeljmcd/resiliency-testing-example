@@ -5,6 +5,20 @@ resiliency testing in a Kubernetes-based environment.
 
 ## The Scenario
 
+The basic solution deployed into Kubernetes looks like this:
+
+    |ActiveMQ Broker (x2)| --( )-> [Processor]
+                                       |
+                                       v
+                                    [Wiremock]
+                                       |
+                                       v
+                                    [Simple Web Service]
+
+The web service in question simply echoes back its input body and functions
+merely to illustrate dependencies. The two ActiveMQ brokers use a shared file
+system and will failover if the active node is terminated.
+
 ## Prerequisites
 
 Most of the work occurs in the cluster, but to get everything running you will
@@ -31,6 +45,41 @@ at `localhost:5000` you can start it with the command below.
 
 ## Running Tests
 
+To run the tests, take the following steps from the root of this repository:
+
+    export NS=resiliency-testing-namespace
+
+    # Build the docker images:
+    sh build-docker-images.sh
+
+    # Deploy the resources to a local Kubernetes cluster:
+    kubectl -n $NS apply -f manifest.yml
+
+    # Wait for the resources to be created...
+    # Verify with:
+    kubectl -n $NS get all
+
+    # Next run the load tests that tinker with Wiremock:
+    cd src/test-repo
+    kubectl -n $NS apply -f manifest.yml
+    # We can check the status of the job like so:
+    kubectl -n $NS get job --watch
+    # Once the job completes, we can view the test results from the mount point.
+
+    # Finally run the chaos experiment
+    cd ../failure-tests
+
+    # Forward ports needed for the test:
+    kubectl -n $NS port-forward pod/mq-broker-0 8161:8161 & 
+    kubectl -n $NS port-forward pod/mq-broker-1 8162:8161 & 
+    kubectl -n $NS port-forward pod/mq-broker-0 61613:61613 &
+    kubectl -n $NS port-forward pod/mq-broker-1 61614:61613 &
+
+    # Run the experiment:
+    PYTHONPATH="$PYTHONPATH:." chaos --verbose run broker-failover.json
+
+Beyond this, the whole app is a sandbox. Have fun!
+
 ## License
 
-MIT Licensed (See License.md), Michael McDermott, 2019.
+MIT Licensed (See LICENSE.md), Michael McDermott, 2019.

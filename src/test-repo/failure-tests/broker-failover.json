@@ -72,7 +72,7 @@
                 }
             },
             "pauses": {
-                "after": 5
+                "after": 10
             }
         }
     ]

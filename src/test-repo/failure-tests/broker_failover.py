@@ -2,12 +2,14 @@ import requests
 import json
 import stomp
 
-QUEUE_NAME = 'MESSAGES.T.ALL'
-
 def determineBrokerUrls():
     # TODO: use environment variables and the like here
-    return ['mq-broker-0.docker.internal',
+    return ['mq-broker-0.docker.internal', 
             'mq-broker-1.docker.internal']
+
+def determineBrokerStompUrls():
+    return [('localhost', 61613),
+            ('localhost', 61614)]
 
 def fetchQueueDepth(queue):
     queueMetricUrl = '/api/jolokia/read'
@@ -17,33 +19,45 @@ def fetchQueueDepth(queue):
 
     for url in urls:
         fullUrl = 'http://' + url + queueMetricUrl
-        print(fullUrl)
-        res = requests.post(fullUrl, auth=('admin', 'admin'), data=queueRequestBody)
+        print('Trying ' + fullUrl)
 
-        print(res)
+        try:
+            res = requests.post(fullUrl, auth=('admin', 'admin'), data=queueRequestBody)
 
-        if res.status_code == 200:
-            data = json.loads(res.text)
-            print(data)
+            print(res)
 
-            if 'value' in data:
-                return data['value']
+            if res.status_code == 200:
+                data = json.loads(res.text)
+                print(data)
+
+                if 'value' in data:
+                    return data['value']
+        except:
+            print("Unable to access " + fullUrl)
 
     return -1
 
 def publishMessage(queue, message, count):
-    servers = [(x, 61613) for x in determineBrokerUrls()]
+    servers = determineBrokerStompUrls()
 
-    con = stomp.Connection(servers)
-    con.start()
-    con.connect('admin', 'admin', wait=True)
+    for server in servers:
+        print("Trying server " + str(server))
+        try:
+            con = stomp.Connection([server])
+            con.start()
+            con.connect('admin', 'admin', wait=True)
 
-    for i in range(0, count):
-        con.send(body = message, destination = queue)
+            for i in range(0, count):
+                con.send(body = message, destination = queue)
 
-    con.disconnect()
-    return True
+            con.disconnect()
+            return True
+        except stomp.exception.ConnectFailedException:
+            print("Unable to connect to " + str(server))
+    return False
 
 if __name__ == '__main__':
-    print(fetchQueueDepth(QUEUE_NAME))
-#    publishMessage('MESSAGES.T.ALL', 'asdf', 3)
+    QUEUE_NAME = 'MESSAGES.T.ALL'
+
+#    print(fetchQueueDepth(QUEUE_NAME))
+    publishMessage('MESSAGES.T.ALL', 'asdf', 3)

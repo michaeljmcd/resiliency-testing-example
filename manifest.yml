@@ -96,7 +96,6 @@ metadata:
     app: mq-broker-0
   name: mq-broker-0
 spec:
-  clusterIP: None
   selector:
     statefulset.kubernetes.io/pod-name: mq-broker-0
   ports:
@@ -120,7 +119,6 @@ metadata:
     app: mq-broker-1
   name: mq-broker-1
 spec:
-  clusterIP: None
   selector:
     statefulset.kubernetes.io/pod-name: mq-broker-1
   ports:

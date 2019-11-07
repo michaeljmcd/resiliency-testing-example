@@ -7,7 +7,7 @@ resiliency testing in a Kubernetes-based environment.
 
 The basic solution deployed into Kubernetes looks like this:
 
-    |ActiveMQ Broker (x2)| --( )-> [Processor]
+    |ActiveMQ Broker (x2)| --(Q)-> [Processor]
                                        |
                                        v
                                     [Wiremock]

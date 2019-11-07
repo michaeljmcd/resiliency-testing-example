@@ -47,7 +47,7 @@ at `localhost:5000` you can start it with the command below.
 
 To run the tests, take the following steps from the root of this repository:
 
-    export NS=resiliency-testing-namespace
+    export NS=resiliency-testing-example
 
     # Build the docker images:
     sh build-docker-images.sh
